@@ -1,0 +1,14 @@
+@import './base.css';
+
+.app-box {
+
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.game-box {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
