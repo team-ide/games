@@ -1,3 +1,8 @@
+<template>
+  <div class="app-box">
+    <RouterView></RouterView>
+  </div>
+</template>
 <script >
 import { RouterView } from "vue-router";
 export default {
@@ -58,12 +63,6 @@ export default {
   },
 };
 </script>
-
-<template>
-  <div class="app-box">
-    <RouterView></RouterView>
-  </div>
-</template>
 
 <style >
 </style>

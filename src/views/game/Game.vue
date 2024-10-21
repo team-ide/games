@@ -6,6 +6,7 @@ export default {
   setup() {
     return {
       disabled: false,
+      style: { width: "1024px", height: "720px", margin: "10px auto" },
     };
   },
 
@@ -92,8 +93,8 @@ export default {
       canvas.height = height;
       // canvas.fitHeight = true;
       // canvas.fitWidth = true;
-      this.$refs.box.appendChild(canvas);
-      cc.game.run("game-demo");
+      // this.$refs.box.appendChild(canvas);
+      // cc.game.run("game-demo");
     },
     loadResources() {},
     changeSceneSize(width, height) {
@@ -172,7 +173,7 @@ export default {
 
 <template>
   <div class="game-box">
-    <div ref="box" class="game-canvas-box"></div>
+    <div ref="box" class="game-canvas-box" :style="style">sss</div>
   </div>
 </template>
 
@@ -183,10 +184,7 @@ export default {
   position: relative;
 }
 .game-canvas-box {
-  width: 100%;
-  height: 100%;
   position: relative;
-  /* transform: rotate(90deg); */
 }
 .game-canvas-box canvas {
   border: 0px;
