@@ -1,9 +1,13 @@
-<script >
-import Game from "./Game.vue";
-import Toolbar from "./Toolbar.vue";
+<template>
+  <div class="game-page">
+    <Designer></Designer>
+  </div>
+</template>
 
+<script >
+import Designer from "../designer/Index.vue";
 export default {
-  components: [Game, Toolbar],
+  components: { Designer },
   setup() {
     return {
       disabled: false,
@@ -33,21 +37,6 @@ export default {
   },
 };
 </script>
-
-<template>
-  <div class="game-page">
-    <div class="game-view-box">
-      <div class="game-view">
-        <Game></Game>
-      </div>
-    </div>
-    <div class="game-toolbar-box">
-      <div class="game-toolbar">
-        <Toolbar></Toolbar>
-      </div>
-    </div>
-  </div>
-</template>
 
 <style >
 .game-page {
