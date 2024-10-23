@@ -9,16 +9,30 @@
       left
     </div>
     <div
+      class="change-width-bar"
+      @mousedown="
+        designer.changeSizeStart($event, {
+          obj: designer.body.left,
+          width: true,
+          minWidth: 60,
+        })
+      "
+      :style="{
+        left: `${designer.body.left.width}px`,
+      }"
+    ></div>
+    <div
       class="center"
       ref="center"
       :style="{
-        left: `${designer.body.left.width}px`,
-        right: `${designer.body.right.width}px`,
+        left: `${designer.body.left.width + 6}px`,
+        right: `${designer.body.right.width + 6}px`,
       }"
     >
       <div
         class="viewport-container"
         ref="viewportContainer"
+        @mousedown="containerScrollStart($event)"
         :style="{
           width: `${bodyWidth + designer.viewport.width * scale}px`,
           height: `${bodyHeight + designer.viewport.height * scale}px`,
@@ -36,6 +50,20 @@
         </Viewport>
       </div>
     </div>
+    <div
+      class="change-width-bar"
+      @mousedown="
+        designer.changeSizeStart($event, {
+          obj: designer.body.right,
+          width: true,
+          minWidth: 60,
+          widthReverse: true,
+        })
+      "
+      :style="{
+        right: `${designer.body.right.width}px`,
+      }"
+    ></div>
     <div
       class="right"
       :style="{
@@ -57,8 +85,6 @@ export default {
       disabled: false,
       bodyWidth: 0,
       bodyHeight: 0,
-      minScale: 10,
-      maxScale: 600,
       scale: 1,
       viewport: {
         width: 1024,
@@ -67,7 +93,11 @@ export default {
     };
     return data;
   },
-
+  watch: {
+    "designer.viewport.scale"() {
+      this.scale = Number(this.designer.viewport.scale / 100).toFixed(2);
+    },
+  },
   methods: {
     init() {
       this.scale = Number(this.designer.viewport.scale / 100).toFixed(2);
@@ -78,10 +108,6 @@ export default {
     initBody() {
       this.bodyWidth = this.$refs.body.clientWidth;
       this.bodyHeight = this.$refs.body.clientHeight;
-      // this.set({
-      //   bodyWidth: this.$refs.body.clientWidth,
-      //   bodyHeight: this.$refs.body.clientHeight,
-      // });
       this.$nextTick(() => {
         this.viewportToCenter();
       });
@@ -89,18 +115,8 @@ export default {
     viewportToCenter() {
       this.setScrollToCenter(this.$refs.center, this.$refs.viewportContainer);
     },
-    /**
-     *点击元素自动滚动到水平或垂直中间位置
-     * @param {HTMLElement} scrollDom - 滚动的元素
-     * @param {HTMLElement} targetDom - 点击的元素
-     * @param {string} [type='x'] - x表示水平，y表示垂直,默认为水平
-     */
     setScrollToCenter(scrollDom, targetDom, type) {
       if (!scrollDom || !targetDom) return false;
-      //如果是浏览器body的滚动条
-      if ([window, document, document.documentElement].includes(scrollDom)) {
-        scrollDom = document.documentElement;
-      }
       const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = targetDom;
       const { clientWidth, clientHeight } = scrollDom;
 
@@ -120,6 +136,22 @@ export default {
       }
       scrollDom.scrollTo(config);
     },
+    containerScrollStart(event) {
+      // 鼠标按下时的位置
+      this.designer.mouseDownX = event.clientX;
+      this.designer.mouseDownY = event.clientY;
+      this.designer.mouse_do_ing = true;
+
+      this.designer.onMouseMove = (moveX, moveY) => {
+        let dom = this.$refs.center;
+        const { scrollLeft, scrollTop } = dom;
+        dom.scrollTo({
+          left: scrollLeft - moveX,
+          top: scrollTop - moveY,
+        });
+      };
+      this.designer.bindMouseEvent();
+    },
     disable() {},
     resize() {
       this.initBody();
@@ -136,29 +168,27 @@ export default {
       const delta = event.deltaY > 0 ? -10 : 10; // 根据滚动方向调整缩放比例
       let oldScale = Number(this.designer.viewport.scale);
       let scale = oldScale + delta;
-      if (scale < this.minScale) {
-        scale = this.minScale;
+      if (scale < this.designer.minScale) {
+        scale = this.designer.minScale;
       }
-      if (scale > this.maxScale) {
-        scale = this.maxScale;
+      if (scale > this.designer.maxScale) {
+        scale = this.designer.maxScale;
       }
       if (oldScale != scale) {
         this.designer.viewport.scale = scale;
-        this.scale = Number(this.designer.viewport.scale / 100).toFixed(2);
       }
       this.$nextTick(() => {
-        this.initBody();
+        // this.initBody();
         this.$nextTick(() => {
           delete this.wheel_ing;
         });
       });
     },
+    changeRightWidthStart() {},
     bingEvent() {
-      window.addEventListener("resize", this.resize);
       this.$refs.viewportContainer.addEventListener("wheel", this.wheel);
     },
     unbingEvent() {
-      window.removeEventListener("resize", this.resize);
       this.$refs.viewportContainer.removeEventListener("wheel", this.wheel);
     },
   },
@@ -189,7 +219,7 @@ export default {
   min-width: 60px;
   overflow: hidden;
   overflow-y: auto;
-  border-right: 1px solid #e5e5e5;
+  /* border-right: 1px solid #e5e5e5; */
   box-sizing: border-box;
   background: #f6f7f8;
   z-index: 1;
@@ -202,7 +232,7 @@ export default {
   min-width: 60px;
   overflow: hidden;
   overflow-y: auto;
-  border-left: 1px solid #e5e5e5;
+  /* border-left: 1px solid #e5e5e5; */
   box-sizing: border-box;
   background: #f6f7f8;
   z-index: 1;
@@ -221,6 +251,31 @@ export default {
   align-items: center;
   justify-content: center;
   background: #eaecee;
+  box-sizing: border-box;
+}
+
+.change-width-bar {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  width: 6px;
+  box-sizing: border-box;
+  cursor: w-resize;
+  background-color: #f6f7f8;
+}
+
+.change-width-bar:after {
+  content: "";
+  width: 4px;
+  height: 100%;
+  box-sizing: border-box;
+  display: block;
+  margin: 0px auto;
+  transition: background-color 0.5s ease;
+}
+
+.change-width-bar:hover:after {
+  background-color: #c6c6c6;
 }
 
 ::-webkit-scrollbar {

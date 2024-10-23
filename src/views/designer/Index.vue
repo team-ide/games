@@ -1,6 +1,12 @@
 <template>
-  <div class="designer">
+  <div
+    class="designer"
+    :class="{
+      'designer-mouse-do-ing': designer.mouse_do_ing,
+    }"
+  >
     <Head
+      ref="Head"
       :designer="designer"
       :style="{
         height: `${designer.head.height}px`,
@@ -8,6 +14,7 @@
     >
     </Head>
     <Toolbar
+      ref="Toolbar"
       :designer="designer"
       :style="{
         height: `${designer.toolbar.height}px`,
@@ -15,6 +22,7 @@
     >
     </Toolbar>
     <Body
+      ref="Body"
       :designer="designer"
       :style="{
         height: `calc(100% - ${
@@ -24,6 +32,7 @@
     >
     </Body>
     <Foot
+      ref="Foot"
       :designer="designer"
       :style="{
         height: `${designer.foot.height}px`,
@@ -48,7 +57,6 @@ export default {
     let data = {
       designer,
       ready: false,
-      disabled: false,
     };
     return data;
   },
@@ -56,16 +64,34 @@ export default {
   methods: {
     init() {
       this.ready = true;
+      this.designer.resize = this.resize;
+      this.designer.bindMouseEvent = this.bindMouseEvent;
+      this.designer.unbindMouseEvent = this.unbindMouseEvent;
     },
     disable() {},
     resize() {
-      this.initBody();
+      this.$refs.Body.resize();
+    },
+    mouseup(event) {
+      this.designer.mouseup(event);
+    },
+    mousemove(event) {
+      this.designer.mousemove(event);
+    },
+    bindMouseEvent() {
+      window.addEventListener("mouseup", this.mouseup);
+      window.addEventListener("mousemove", this.mousemove);
+    },
+    unbindMouseEvent() {
+      window.removeEventListener("mouseup", this.mouseup);
+      window.removeEventListener("mousemove", this.mousemove);
     },
     bingEvent() {
       window.addEventListener("resize", this.resize);
     },
     unbingEvent() {
       window.removeEventListener("resize", this.resize);
+      this.unbindMouseEvent();
     },
   },
   mounted() {
@@ -74,9 +100,8 @@ export default {
   },
   updated() {},
   beforeUnmount() {
-    this.disabled = true;
     this.unbingEvent();
-    this.disable();
+    this.designer.disable();
   },
 };
 </script>
@@ -87,5 +112,8 @@ export default {
   width: 100%;
   height: 100%;
   box-sizing: border-box;
+}
+.designer.designer-mouse-do-ing {
+  user-select: none;
 }
 </style>

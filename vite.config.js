@@ -2,6 +2,8 @@ import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
+
+
 // https://vitejs.dev/config/
 export default defineConfig((conditionalConfig) => {
 
@@ -11,6 +13,9 @@ export default defineConfig((conditionalConfig) => {
     plugins: [
       vue(),
     ],
+    build: {
+      target: [],
+    },
     root: process.cwd(), // 项目根目录（index.html 文件所在的位置）
     base: env.VITE_MODE === 'production' ? './' : '/', // 开发或生产环境服务的公共基础路径。
     server: {
