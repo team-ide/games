@@ -8,8 +8,8 @@ class Designer {
     initOptions() {
         this.mouse_do_ing = false
         this.disabled = false
-        this.minScale = 10
-        this.maxScale = 210
+        this.minScale = 20
+        this.maxScale = 800
         let keys = ["head", "toolbar", "body", "foot"]
         keys.forEach(key => {
             this.setDefault(this, key, {})
@@ -33,7 +33,7 @@ class Designer {
         this.setDefault(this.viewport, "width", 1024)
         this.setDefault(this.viewport, "height", 720)
         // 默认 试图 缩放 transform: scale(0.6)
-        this.setDefault(this.viewport, "scale", 80)
+        this.setDefault(this.viewport, "scale", 110)
         // 滚轮缩放
         this.setDefault(this.viewport, "wheelScale", true)
 

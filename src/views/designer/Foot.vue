@@ -16,7 +16,20 @@
         right: `${designer.foot.right.width}px`,
       }"
     >
-      <span>{{ designer.minScale }}%</span>
+      <el-input
+        v-model="designer.viewport.width"
+        size="small"
+        style="width: 50px"
+      >
+      </el-input>
+      <span class="mdi mdi-close" style="padding: 0px 5px"></span>
+      <el-input
+        v-model="designer.viewport.height"
+        size="small"
+        style="width: 50px"
+      >
+      </el-input>
+      <span style="margin-left: 10px">{{ designer.minScale }}%</span>
       <div
         class="scale-bar"
         ref="scaleBar"
@@ -27,15 +40,15 @@
         <div
           class="scale-bar-slider"
           :style="{
-            left: `${
-              scaleNumber1 * (this.designer.viewport.scale - designer.minScale)
-            }px`,
+            left: `${scaleBar.left}px`,
           }"
           @mousedown="scaleBarStart($event)"
         ></div>
       </div>
-      <span>{{ designer.maxScale }}%</span>
-      <span>{{ this.designer.viewport.scale }}%</span>
+      <span style="margin-right: 10px">{{ designer.maxScale }}%</span>
+      <span style="display: inline-block; width: 40px; text-align: center">
+        {{ this.designer.viewport.scale }}%
+      </span>
     </div>
     <div
       class="right"
@@ -51,21 +64,36 @@
 <script >
 export default {
   props: ["designer"],
-  components: [],
+  components: {},
   data() {
     return {
       scaleNumber: 0,
       scaleNumber1: 0,
       scaleBar: {
+        left: 50,
         width: 100,
       },
     };
   },
-
+  watch: {
+    "designer.viewport.scale"() {
+      if (this.isScaleBar) {
+        delete this.isScaleBar;
+        return;
+      }
+      this.scaleBar.left =
+        this.scaleNumber1 *
+        (this.designer.viewport.scale - this.designer.minScale);
+    },
+  },
   methods: {
     init() {
       this.scaleNumber = this.designer.maxScale - this.designer.minScale;
       this.scaleNumber1 = this.scaleBar.width / this.scaleNumber;
+      this.scaleBar.left =
+        this.scaleNumber1 *
+        (this.designer.viewport.scale - this.designer.minScale);
+      this.scaleNumber2 = (this.scaleNumber / this.scaleBar.width).toFixed(0);
     },
     scaleBarStart(event) {
       // 鼠标按下时的位置
@@ -73,8 +101,18 @@ export default {
       this.designer.mouseDownY = event.clientY;
       this.designer.mouse_do_ing = true;
       this.designer.onMouseMove = (moveX, moveY) => {
+        let oldLeft = Number(this.scaleBar.left);
+        let left = oldLeft + Number(moveX);
+        if (left > this.scaleBar.width) {
+          left = this.scaleBar.width;
+        }
+        if (left < 0) {
+          left = 0;
+        }
+        this.scaleBar.left = left;
         let oldScale = Number(this.designer.viewport.scale);
-        let scale = Number(oldScale) + Number(moveX / this.scaleNumber1);
+        let scale =
+          Number(oldScale) + Number((left - oldLeft) * this.scaleNumber2);
         if (scale < this.designer.minScale) {
           scale = this.designer.minScale;
         }
@@ -82,6 +120,7 @@ export default {
           scale = this.designer.maxScale;
         }
         if (oldScale != scale) {
+          this.isScaleBar = true;
           this.designer.viewport.scale = scale;
         }
       };
