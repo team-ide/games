@@ -135,8 +135,14 @@ export default {
     init() {
       this.scale = Number((this.designer.viewport.scale / 100).toFixed(2));
       this.$nextTick(() => {
-        this.initBody();
-        this.initScalePlate();
+        this.bodyWidth = this.$refs.body.clientWidth;
+        this.bodyHeight = this.$refs.body.clientHeight;
+        this.$nextTick(() => {
+          this.viewportToCenter();
+          this.$nextTick(() => {
+            this.initScalePlate();
+          });
+        });
       });
     },
     initScalePlate() {
@@ -151,10 +157,11 @@ export default {
       });
     },
     initBody() {
-      this.bodyWidth = this.$refs.body.clientWidth;
-      this.bodyHeight = this.$refs.body.clientHeight;
       this.$nextTick(() => {
-        this.viewportToCenter();
+        const { scrollLeft, scrollTop } = this.$refs.center;
+        this.scroll.left = scrollLeft;
+        this.scroll.top = scrollTop;
+        this.$refs.scalePlate.initPlace();
       });
     },
     viewportScroll() {
