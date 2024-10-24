@@ -14,6 +14,10 @@ export default {
     );
     return {};
   },
+  data() {
+    console.log("data setup 调用 data 和 method");
+    return {};
+  },
 
   // 组件挂载到节点上之前执行的函数
   beforeMount() {

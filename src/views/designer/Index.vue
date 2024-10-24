@@ -53,7 +53,6 @@ export default {
   components: { Head, Toolbar, Body, Foot },
   data() {
     let designer = new Designer(this.options);
-    console.log(designer);
     let data = {
       designer,
       ready: false,
@@ -65,8 +64,6 @@ export default {
     init() {
       this.ready = true;
       this.designer.resize = this.resize;
-      this.designer.bindMouseEvent = this.bindMouseEvent;
-      this.designer.unbindMouseEvent = this.unbindMouseEvent;
     },
     disable() {},
     resize() {
@@ -78,20 +75,15 @@ export default {
     mousemove(event) {
       this.designer.mousemove(event);
     },
-    bindMouseEvent() {
+    bingEvent() {
+      window.addEventListener("resize", this.resize);
       window.addEventListener("mouseup", this.mouseup);
       window.addEventListener("mousemove", this.mousemove);
     },
-    unbindMouseEvent() {
-      window.removeEventListener("mouseup", this.mouseup);
-      window.removeEventListener("mousemove", this.mousemove);
-    },
-    bingEvent() {
-      window.addEventListener("resize", this.resize);
-    },
     unbingEvent() {
       window.removeEventListener("resize", this.resize);
-      this.unbindMouseEvent();
+      window.removeEventListener("mouseup", this.mouseup);
+      window.removeEventListener("mousemove", this.mousemove);
     },
   },
   mounted() {

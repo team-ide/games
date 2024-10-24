@@ -2,6 +2,9 @@
   <div class="designer-body" ref="body">
     <div
       class="left"
+      :class="{
+        close: designer.body.left.close,
+      }"
       :style="{
         width: `${designer.body.left.width}px`,
       }"
@@ -17,18 +20,21 @@
           minWidth: 60,
         })
       "
-      :style="{
-        left: `${designer.body.left.width}px`,
-      }"
-    ></div>
-    <div
-      class="center"
-      ref="center"
-      :style="{
-        left: `${designer.body.left.width + 6}px`,
-        right: `${designer.body.right.width + 6}px`,
-      }"
     >
+      <div
+        v-if="!designer.body.left.close"
+        class="mdi mdi-menu-left"
+        @mousedown.stop="designer.preventDefault"
+        @click="designer.close(designer.body.left, $event)"
+      ></div>
+      <div
+        v-if="designer.body.left.close"
+        class="mdi mdi-menu-right"
+        @mousedown.stop="designer.preventDefault"
+        @click="designer.open(designer.body.left, $event)"
+      ></div>
+    </div>
+    <div class="center" ref="center" @scroll="viewportScroll">
       <div
         class="viewport-container"
         ref="viewportContainer"
@@ -38,6 +44,15 @@
           height: `${bodyHeight + designer.viewport.height * scale}px`,
         }"
       >
+        <ScalePlate
+          ref="scalePlate"
+          :designer="designer"
+          :scroll="scroll"
+          :scale="scale"
+          :bodyWidth="bodyWidth"
+          :bodyHeight="bodyHeight"
+        >
+        </ScalePlate>
         <Viewport
           ref="viewport"
           :designer="designer"
@@ -60,12 +75,25 @@
           widthReverse: true,
         })
       "
-      :style="{
-        right: `${designer.body.right.width}px`,
-      }"
-    ></div>
+    >
+      <div
+        v-if="!designer.body.right.close"
+        class="mdi mdi-menu-right"
+        @mousedown.stop="designer.preventDefault"
+        @click="designer.close(designer.body.right, $event)"
+      ></div>
+      <div
+        v-if="designer.body.right.close"
+        class="mdi mdi-menu-left"
+        @mousedown.stop="designer.preventDefault"
+        @click="designer.open(designer.body.right, $event)"
+      ></div>
+    </div>
     <div
       class="right"
+      :class="{
+        close: designer.body.right.close,
+      }"
       :style="{
         width: `${designer.body.right.width}px`,
       }"
@@ -75,11 +103,12 @@
   </div>
 </template>
 <script >
+import ScalePlate from "./ScalePlate.vue";
 import Viewport from "./Viewport.vue";
 
 export default {
   props: ["designer"],
-  components: { Viewport },
+  components: { ScalePlate, Viewport },
   data() {
     let data = {
       disabled: false,
@@ -90,19 +119,35 @@ export default {
         width: 1024,
         height: 768,
       },
+      scroll: {
+        left: 0,
+        top: 0,
+      },
     };
     return data;
   },
   watch: {
     "designer.viewport.scale"() {
-      this.scale = Number(this.designer.viewport.scale / 100).toFixed(2);
+      this.scale = Number((this.designer.viewport.scale / 100).toFixed(2));
     },
   },
   methods: {
     init() {
-      this.scale = Number(this.designer.viewport.scale / 100).toFixed(2);
+      this.scale = Number((this.designer.viewport.scale / 100).toFixed(2));
       this.$nextTick(() => {
         this.initBody();
+        this.initScalePlate();
+      });
+    },
+    initScalePlate() {
+      this.$nextTick(() => {
+        const { scrollLeft, scrollTop } = this.$refs.center;
+        this.scroll.left = scrollLeft;
+        this.scroll.top = scrollTop;
+        this.$refs.scalePlate.initView(
+          this.$refs.viewportContainer,
+          this.$refs.viewport.$el
+        );
       });
     },
     initBody() {
@@ -111,6 +156,12 @@ export default {
       this.$nextTick(() => {
         this.viewportToCenter();
       });
+    },
+    viewportScroll() {
+      const { scrollLeft, scrollTop } = this.$refs.center;
+      this.scroll.left = scrollLeft;
+      this.scroll.top = scrollTop;
+      this.$refs.scalePlate.initPlace();
     },
     viewportToCenter() {
       this.setScrollToCenter(this.$refs.center, this.$refs.viewportContainer);
@@ -135,22 +186,24 @@ export default {
         config.top = top;
       }
       scrollDom.scrollTo(config);
+      return config;
     },
     containerScrollStart(event) {
+      const { clientX, clientY } = event;
       // 鼠标按下时的位置
-      this.designer.mouseDownX = event.clientX;
-      this.designer.mouseDownY = event.clientY;
+      this.designer.mouseDownX = clientX;
+      this.designer.mouseDownY = clientY;
       this.designer.mouse_do_ing = true;
 
       this.designer.onMouseMove = (moveX, moveY) => {
         let dom = this.$refs.center;
         const { scrollLeft, scrollTop } = dom;
-        dom.scrollTo({
+        let config = {
           left: scrollLeft - moveX,
           top: scrollTop - moveY,
-        });
+        };
+        dom.scrollTo(config);
       };
-      this.designer.bindMouseEvent();
     },
     disable() {},
     resize() {
@@ -178,13 +231,12 @@ export default {
         this.designer.viewport.scale = scale;
       }
       this.$nextTick(() => {
-        // this.initBody();
+        this.initScalePlate();
         this.$nextTick(() => {
           delete this.wheel_ing;
         });
       });
     },
-    changeRightWidthStart() {},
     bingEvent() {
       this.$refs.viewportContainer.addEventListener("wheel", this.wheel);
     },
@@ -210,12 +262,11 @@ export default {
   position: relative;
   width: 100%;
   box-sizing: border-box;
+  display: flex;
 }
 .designer-body > .left {
-  position: absolute;
-  left: 0px;
-  top: 0px;
-  bottom: 0px;
+  position: relative;
+  height: 100%;
   min-width: 60px;
   overflow: hidden;
   overflow-y: auto;
@@ -223,12 +274,15 @@ export default {
   box-sizing: border-box;
   background: #f6f7f8;
   z-index: 1;
+  flex: none;
+}
+.designer-body > .left.close {
+  width: 0px !important;
+  min-width: 0px !important;
 }
 .designer-body > .right {
-  position: absolute;
-  right: 0px;
-  top: 0px;
-  bottom: 0px;
+  position: relative;
+  height: 100%;
   min-width: 60px;
   overflow: hidden;
   overflow-y: auto;
@@ -236,12 +290,16 @@ export default {
   box-sizing: border-box;
   background: #f6f7f8;
   z-index: 1;
+  flex: none;
+}
+.designer-body > .right.close {
+  width: 0px !important;
+  min-width: 0px !important;
 }
 
 .designer-body > .center {
-  position: absolute;
-  top: 0px;
-  bottom: 0px;
+  position: relative;
+  height: 100%;
   overflow: auto;
   box-sizing: border-box;
 }
@@ -252,30 +310,46 @@ export default {
   justify-content: center;
   background: #eaecee;
   box-sizing: border-box;
+  position: relative;
 }
 
 .change-width-bar {
-  position: absolute;
-  top: 0px;
-  bottom: 0px;
+  position: relative;
+  height: 100%;
   width: 6px;
   box-sizing: border-box;
   cursor: w-resize;
   background-color: #f6f7f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
 }
 
-.change-width-bar:after {
+.change-width-bar:before {
   content: "";
   width: 4px;
   height: 100%;
   box-sizing: border-box;
   display: block;
-  margin: 0px auto;
   transition: background-color 0.5s ease;
+  position: absolute;
+  left: 1px;
+  top: 0px;
 }
 
-.change-width-bar:hover:after {
+.change-width-bar:hover:before {
   background-color: #c6c6c6;
+}
+
+.change-width-bar .mdi {
+  position: relative;
+  font-size: 25px;
+  color: #8d8d8d;
+  cursor: pointer;
+  width: 25px;
+  height: 25px;
+  line-height: 25px;
 }
 
 ::-webkit-scrollbar {

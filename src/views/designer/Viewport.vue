@@ -3,10 +3,9 @@
 </template>
 <script >
 export default {
-  components: [],
-  setup() {
-    return {
-    };
+  components: {},
+  data() {
+    return {};
   },
 
   methods: {
@@ -21,8 +20,6 @@ export default {
 
 <style >
 .viewport {
-  width: 100%;
-  height: 100%;
   position: relative;
   background: #ddd;
 }

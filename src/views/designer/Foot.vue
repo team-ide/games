@@ -16,18 +16,10 @@
         right: `${designer.foot.right.width}px`,
       }"
     >
-      <el-input
-        v-model="designer.viewport.width"
-        size="small"
-        style="width: 50px"
-      >
+      <el-input v-model="designer.viewport.width" style="width: 50px">
       </el-input>
       <span class="mdi mdi-close" style="padding: 0px 5px"></span>
-      <el-input
-        v-model="designer.viewport.height"
-        size="small"
-        style="width: 50px"
-      >
+      <el-input v-model="designer.viewport.height" style="width: 50px">
       </el-input>
       <span style="margin-left: 10px">{{ designer.minScale }}%</span>
       <div
@@ -56,7 +48,8 @@
         width: `${designer.foot.right.width}px`,
       }"
     >
-      right
+      <span style="margin-left: 10px">x : {{ designer.clientX }}</span>
+      <span style="margin-left: 10px">y : {{ designer.clientY }}</span>
     </div>
   </div>
 </template>
@@ -96,9 +89,10 @@ export default {
       this.scaleNumber2 = (this.scaleNumber / this.scaleBar.width).toFixed(0);
     },
     scaleBarStart(event) {
+      const { clientX, clientY } = event;
       // 鼠标按下时的位置
-      this.designer.mouseDownX = event.clientX;
-      this.designer.mouseDownY = event.clientY;
+      this.designer.mouseDownX = clientX;
+      this.designer.mouseDownY = clientY;
       this.designer.mouse_do_ing = true;
       this.designer.onMouseMove = (moveX, moveY) => {
         let oldLeft = Number(this.scaleBar.left);
@@ -124,7 +118,6 @@ export default {
           this.designer.viewport.scale = scale;
         }
       };
-      this.designer.bindMouseEvent();
     },
   },
   mounted() {
@@ -153,6 +146,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  padding: 0px 20px;
 }
 
 .designer-foot > .center {
@@ -163,7 +157,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding-right: 20px;
+  padding: 0px 20px;
 }
 
 .designer-foot > .right {
@@ -174,6 +168,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  padding: 0px 20px;
 }
 .scale-bar {
   position: relative;
@@ -194,5 +189,10 @@ export default {
   margin-top: -2px;
   margin-left: -5px;
   border-radius: 10px;
+  cursor: pointer;
+}
+
+.designer-foot {
+  --el-component-size-small: 20px;
 }
 </style>

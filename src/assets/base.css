@@ -10,11 +10,3 @@ body,
   height: 100%;
   position: relative;
 }
-
-:root {
-  --el-component-size-small: 20px;
-}
-
-.el-input--small .el-input__inner {
-  --el-input-inner-height: calc(var(--el-input-height, 24px) - 4px);
-}
