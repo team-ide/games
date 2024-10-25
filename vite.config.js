@@ -30,8 +30,10 @@ export default defineConfig((conditionalConfig) => {
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
-        'views': fileURLToPath(new URL('./src/views', import.meta.url)),
-        'components': fileURLToPath(new URL('./src/components', import.meta.url)),
+        'v': fileURLToPath(new URL('./src/views', import.meta.url)),
+        'c': fileURLToPath(new URL('./src/components', import.meta.url)),
+        'tool': fileURLToPath(new URL('./src/tool', import.meta.url)),
+        'server': fileURLToPath(new URL('./src/server', import.meta.url)),
       },
     },
   }

@@ -8,6 +8,15 @@ import router from './router'
 
 import 'element-plus/dist/index.css'
 
+
+
+import tool from "tool"
+
+if (typeof window !== 'undefined') {
+    console.log("tool style init")
+    tool.style.init();
+}
+
 import './assets/main.css'
 
 const app = createApp(App)
@@ -15,6 +24,10 @@ const app = createApp(App)
 // 设置为非严格模式
 app.config.isStrictMode = false;
 app.use(router)
+app.use({
+    install(app) {
+    },
+})
 app.use(ElementPlus, { size: 'small', zIndex: 3000 })
 
 app.mount('#app')

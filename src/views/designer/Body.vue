@@ -62,6 +62,9 @@
             transform: `scale(${scale})`,
           }"
         >
+          <template v-slot:viewport>
+            <slot name="viewport"></slot>
+          </template>
         </Viewport>
       </div>
     </div>
@@ -106,6 +109,8 @@
 import ScalePlate from "./ScalePlate.vue";
 import Viewport from "./Viewport.vue";
 
+import tool from "tool";
+
 export default {
   props: ["designer"],
   components: { ScalePlate, Viewport },
@@ -133,15 +138,13 @@ export default {
   },
   methods: {
     init() {
+      this.bodyWidth = this.$el.clientWidth;
+      this.bodyHeight = this.$el.clientHeight;
       this.scale = Number((this.designer.viewport.scale / 100).toFixed(2));
       this.$nextTick(() => {
-        this.bodyWidth = this.$refs.body.clientWidth;
-        this.bodyHeight = this.$refs.body.clientHeight;
+        this.viewportToCenter();
         this.$nextTick(() => {
-          this.viewportToCenter();
-          this.$nextTick(() => {
-            this.initScalePlate();
-          });
+          this.initScalePlate();
         });
       });
     },
@@ -323,7 +326,7 @@ export default {
 .change-width-bar {
   position: relative;
   height: 100%;
-  width: 6px;
+  width: 10px;
   box-sizing: border-box;
   cursor: w-resize;
   background-color: #f6f7f8;
@@ -331,18 +334,21 @@ export default {
   align-items: center;
   justify-content: center;
   flex: none;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .change-width-bar:before {
   content: "";
-  width: 4px;
+  width: 6px;
   height: 100%;
   box-sizing: border-box;
   display: block;
   transition: background-color 0.5s ease;
   position: absolute;
-  left: 1px;
+  left: 2px;
   top: 0px;
+  box-sizing: border-box;
 }
 
 .change-width-bar:hover:before {

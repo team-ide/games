@@ -9,15 +9,7 @@
     >
       left
     </div>
-    <div
-      class="center"
-      :style="{
-        left: `${designer.toolbar.left.width}px`,
-        right: `${designer.toolbar.right.width}px`,
-      }"
-    >
-      center
-    </div>
+    <div class="center">center</div>
     <div
       class="right"
       :style="{
@@ -55,36 +47,33 @@ export default {
   min-width: 650px;
   border-bottom: 1px solid #dfe2e5;
   box-sizing: border-box;
+  display: flex;
 }
 
 .designer-toolbar > .left {
-  position: absolute;
-  left: 0;
-  top: 0;
+  position: relative;
   height: 100%;
-  overflow: hidden;
   display: flex;
+  flex: none;
   align-items: center;
-  justify-content: flex-start;
+  box-sizing: border-box;
 }
 
 .designer-toolbar > .center {
-  position: absolute;
-  top: 0;
+  position: relative;
   height: 100%;
-  overflow: hidden;
   display: flex;
+  flex: 1;
   align-items: center;
-  justify-content: flex-start;
+  box-sizing: border-box;
 }
 
 .designer-toolbar > .right {
-  position: absolute;
-  top: 0;
-  right: 0;
+  position: relative;
   height: 100%;
   display: flex;
+  flex: none;
   align-items: center;
-  justify-content: flex-start;
+  box-sizing: border-box;
 }
 </style>

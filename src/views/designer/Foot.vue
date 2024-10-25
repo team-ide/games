@@ -9,19 +9,11 @@
     >
       left
     </div>
-    <div
-      class="center"
-      :style="{
-        left: `${designer.foot.left.width}px`,
-        right: `${designer.foot.right.width}px`,
-      }"
-    >
-      <el-input v-model="designer.viewport.width" style="width: 50px">
-      </el-input>
-      <span class="mdi mdi-close" style="padding: 0px 5px"></span>
-      <el-input v-model="designer.viewport.height" style="width: 50px">
-      </el-input>
-      <span style="margin-left: 10px">{{ designer.minScale }}%</span>
+    <div class="center">
+      <el-input v-model="designer.viewport.width" class="wd-50"> </el-input>
+      <span class="mdi mdi-close pdlr-5"></span>
+      <el-input v-model="designer.viewport.height" class="wd-50"> </el-input>
+      <span class="mgl-10">{{ designer.minScale }}%</span>
       <div
         class="scale-bar"
         ref="scaleBar"
@@ -37,7 +29,7 @@
           @mousedown="scaleBarStart($event)"
         ></div>
       </div>
-      <span style="margin-right: 10px">{{ designer.maxScale }}%</span>
+      <span class="mgr-10">{{ designer.maxScale }}%</span>
       <span style="display: inline-block; width: 40px; text-align: center">
         {{ this.designer.viewport.scale }}%
       </span>
@@ -48,8 +40,8 @@
         width: `${designer.foot.right.width}px`,
       }"
     >
-      <span style="margin-left: 10px">x : {{ designer.clientX }}</span>
-      <span style="margin-left: 10px">y : {{ designer.clientY }}</span>
+      <span class="mgr-10">x : {{ designer.clientX }}</span>
+      <span class="mgr-10">y : {{ designer.clientY }}</span>
     </div>
   </div>
 </template>
@@ -135,41 +127,40 @@ export default {
   min-width: 650px;
   border-bottom: 1px solid #dfe2e5;
   box-sizing: border-box;
+  display: flex;
 }
 
 .designer-foot > .left {
-  position: absolute;
-  left: 0;
-  top: 0;
+  position: relative;
   height: 100%;
-  overflow: hidden;
   display: flex;
+  flex: none;
   align-items: center;
-  justify-content: flex-start;
-  padding: 0px 20px;
+  padding: 0px 10px;
+  box-sizing: border-box;
 }
 
 .designer-foot > .center {
-  position: absolute;
-  top: 0;
+  position: relative;
   height: 100%;
-  overflow: hidden;
   display: flex;
+  flex: 1;
   align-items: center;
   justify-content: flex-end;
-  padding: 0px 20px;
+  padding: 0px 10px;
+  box-sizing: border-box;
 }
 
 .designer-foot > .right {
-  position: absolute;
-  top: 0;
-  right: 0;
+  position: relative;
   height: 100%;
   display: flex;
+  flex: none;
   align-items: center;
-  justify-content: flex-start;
-  padding: 0px 20px;
+  padding: 0px 10px;
+  box-sizing: border-box;
 }
+
 .scale-bar {
   position: relative;
   height: 6px;
@@ -191,7 +182,16 @@ export default {
   border-radius: 10px;
   cursor: pointer;
 }
-
+.designer-foot .el-input__wrapper {
+  padding: 0px;
+  outline: none;
+  box-sizing: border-box;
+}
+.designer-foot input {
+  padding: 0px;
+  outline: none;
+  text-align: center;
+}
 .designer-foot {
   --el-component-size-small: 20px;
 }

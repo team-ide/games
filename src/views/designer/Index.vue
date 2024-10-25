@@ -1,6 +1,7 @@
 <template>
   <div
     class="designer"
+    v-if="ready"
     :class="{
       'designer-mouse-do-ing': designer.mouse_do_ing,
     }"
@@ -30,6 +31,9 @@
         }px`,
       }"
     >
+      <template v-slot:viewport>
+        <slot name="viewport"></slot>
+      </template>
     </Body>
     <Foot
       ref="Foot"
@@ -52,9 +56,8 @@ export default {
   props: ["options"],
   components: { Head, Toolbar, Body, Foot },
   data() {
-    let designer = new Designer(this.options);
     let data = {
-      designer,
+      designer: null,
       ready: false,
     };
     return data;
@@ -62,8 +65,10 @@ export default {
 
   methods: {
     init() {
-      this.ready = true;
+      let designer = new Designer(this.options);
+      this.designer = designer;
       this.designer.resize = this.resize;
+      this.ready = true;
     },
     disable() {},
     resize() {

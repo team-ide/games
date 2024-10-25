@@ -1,5 +1,7 @@
 <template>
-  <div class="viewport">显示</div>
+  <div class="viewport">
+    <slot name="viewport"></slot>
+  </div>
 </template>
 <script >
 export default {
